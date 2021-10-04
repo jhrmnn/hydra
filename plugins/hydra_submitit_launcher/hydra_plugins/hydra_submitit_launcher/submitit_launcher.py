@@ -68,13 +68,15 @@ class BaseSubmititLauncher(Launcher):
             job.id = submitit.JobEnvironment().job_id  # type: ignore
             sweep_config.hydra.job.num = job_num
 
-        return run_job(
+        ret = run_job(
             hydra_context=self.hydra_context,
             task_function=self.task_function,
             config=sweep_config,
             job_dir_key=job_dir_key,
             job_subdir_key="hydra.sweep.subdir",
         )
+        ret.return_value
+        return ret
 
     def checkpoint(self, *args: Any, **kwargs: Any) -> Any:
         """Resubmit the current callable at its current state with the same initial arguments."""
@@ -143,7 +145,8 @@ class BaseSubmititLauncher(Launcher):
             )
 
         jobs = executor.map_array(self, *zip(*job_params))
-        return [j.results()[0] for j in jobs]
+        return []
+        # return [j.results()[0] for j in jobs]
 
 
 class LocalLauncher(BaseSubmititLauncher):
